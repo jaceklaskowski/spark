@@ -151,7 +151,7 @@ private[spark] object ResourceUtils extends Logging {
     sparkConf.getAllWithPrefix(s"$componentName.$RESOURCE_PREFIX.").map { case (key, _) =>
       val index = key.indexOf('.')
       if (index < 0) {
-        throw new SparkException(s"You must specify an amount config for resource: $key " +
+        throw new SparkException(s"You must specify an $AMOUNT config for resource: $key " +
           s"config: $componentName.$RESOURCE_PREFIX.$key")
       }
       key.substring(0, index)

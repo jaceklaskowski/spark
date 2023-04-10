@@ -28,7 +28,7 @@ import org.apache.spark.SparkConf
  */
 private[spark] class TorrentBroadcastFactory extends BroadcastFactory {
 
-  override def initialize(isDriver: Boolean, conf: SparkConf): Unit = { }
+  override def initialize(isDriver: Boolean, conf: SparkConf): Unit = {}
 
   override def newBroadcast[T: ClassTag](
       value_ : T,

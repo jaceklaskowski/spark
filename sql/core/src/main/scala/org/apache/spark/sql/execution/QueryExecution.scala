@@ -222,7 +222,7 @@ class QueryExecution(
 
   def simpleString: String = {
     val concat = new PlanStringConcat()
-    simpleString(false, SQLConf.get.maxToStringFields, concat.append)
+    simpleString(formatted = false, SQLConf.get.maxToStringFields, concat.append)
     withRedaction {
       concat.toString
     }
@@ -269,7 +269,7 @@ class QueryExecution(
 
     mode match {
       case SimpleMode =>
-        queryExecution.simpleString(false, maxFields, append)
+        queryExecution.simpleString(formatted = false, maxFields, append)
       case ExtendedMode =>
         queryExecution.toString(maxFields, append)
       case CodegenMode =>

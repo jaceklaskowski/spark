@@ -99,7 +99,8 @@ case class DataSourceV2Relation(
   def withMetadataColumns(): DataSourceV2Relation = {
     val newMetadata = metadataOutput.filterNot(outputSet.contains)
     if (newMetadata.nonEmpty) {
-      DataSourceV2Relation(table, output ++ newMetadata, catalog, identifier, options)
+      // Matches StreamingRelation
+      this.copy(output = output ++ newMetadata)
     } else {
       this
     }

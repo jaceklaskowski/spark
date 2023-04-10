@@ -3094,7 +3094,7 @@ class AstBuilder extends DataTypeAstBuilder with SQLConfHelper with Logging {
     }
     // Add the 'DEFAULT expression' clause in the column definition, if any, to the column metadata.
     defaultExpression.map(visitDefaultExpression).foreach { field =>
-      if (conf.getConf(SQLConf.ENABLE_DEFAULT_COLUMNS)) {
+      if (conf.enableDefaultColumns) {
         // Add default to metadata
         builder.putString(ResolveDefaultColumns.CURRENT_DEFAULT_COLUMN_METADATA_KEY, field)
         builder.putString(ResolveDefaultColumns.EXISTS_DEFAULT_COLUMN_METADATA_KEY, field)
@@ -4187,7 +4187,7 @@ class AstBuilder extends DataTypeAstBuilder with SQLConfHelper with Logging {
       } else {
         None
       }
-    if (setDefaultExpression.isDefined && !conf.getConf(SQLConf.ENABLE_DEFAULT_COLUMNS)) {
+    if (setDefaultExpression.isDefined && !conf.enableDefaultColumns) {
       throw QueryParsingErrors.defaultColumnNotEnabledError(ctx)
     }
 

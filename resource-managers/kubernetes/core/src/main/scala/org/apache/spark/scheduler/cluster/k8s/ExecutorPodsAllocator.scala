@@ -52,7 +52,9 @@ class ExecutorPodsAllocator(
 
   protected val PVC_COUNTER = new AtomicInteger(0)
 
-  protected val maxPVCs = if (Utils.isDynamicAllocationEnabled(conf)) {
+  protected val dynamicAllocationEnabled = Utils.isDynamicAllocationEnabled(conf)
+
+  protected val maxPVCs = if (dynamicAllocationEnabled) {
     conf.get(DYN_ALLOCATION_MAX_EXECUTORS)
   } else {
     conf.getInt(EXECUTOR_INSTANCES.key, DEFAULT_NUMBER_EXECUTORS)
@@ -106,8 +108,6 @@ class ExecutorPodsAllocator(
   // Executor IDs that have been requested from Kubernetes but have not been detected in any POD
   // snapshot yet but already known by the scheduler backend. Mapped to the ResourceProfile id.
   protected val schedulerKnownNewlyCreatedExecs = mutable.LinkedHashMap.empty[Long, Int]
-
-  protected val dynamicAllocationEnabled = Utils.isDynamicAllocationEnabled(conf)
 
   // visible for tests
   val numOutstandingPods = new AtomicInteger()

@@ -1411,7 +1411,7 @@ object HiveExternalCatalog {
       colType: String,
       typeName: String): Seq[String] = {
     for {
-      numCols <- props.get(s"spark.sql.sources.schema.num${colType.capitalize}Cols").toSeq
+      numCols <- props.get(s"${DATASOURCE_SCHEMA_PREFIX}num${colType.capitalize}Cols").toSeq
       index <- 0 until numCols.toInt
     } yield props.getOrElse(
       s"$DATASOURCE_SCHEMA_PREFIX${colType}Col.$index",

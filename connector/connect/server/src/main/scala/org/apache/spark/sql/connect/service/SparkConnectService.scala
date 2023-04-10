@@ -386,7 +386,7 @@ object SparkConnectService extends Logging {
   }
 
   /**
-   * Starts the GRPC Service.
+   * Starts the gRPC Service.
    */
   private def startGRPCService(): Unit = {
     val debugMode = SparkEnv.get.conf.getBoolean("spark.connect.grpc.debug.enabled", true)

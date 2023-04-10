@@ -158,9 +158,9 @@ abstract class AggregationIterator(
       inputAttributes: Seq[Attribute]): (InternalRow, InternalRow) => Unit = {
     val joinedRow = new JoinedRow
     if (expressions.nonEmpty) {
-      val mergeExpressions =
+      val mergeExpressions = {
         functions.zip(expressions.map(ae => (ae.mode, ae.isDistinct, ae.filter))).flatMap {
-          case (ae: DeclarativeAggregate, (mode, isDistinct, filter)) =>
+          case (ae: DeclarativeAggregate, (mode, _, filter)) =>
             mode match {
               case Partial | Complete =>
                 if (filter.isDefined) {
@@ -174,6 +174,7 @@ abstract class AggregationIterator(
             }
           case (agg: AggregateFunction, _) => Seq.fill(agg.aggBufferAttributes.length)(NoOp)
         }
+      }
       // Initialize predicates for aggregate functions if necessary
       val predicateOptions = expressions.map {
         case AggregateExpression(_, mode, _, Some(filter), _) =>
@@ -236,7 +237,7 @@ abstract class AggregationIterator(
     if (modes.contains(Final) || modes.contains(Complete)) {
       val evalExpressions = aggregateFunctions.map {
         case ae: DeclarativeAggregate => ae.evaluateExpression
-        case agg: AggregateFunction => NoOp
+        case _: AggregateFunction => NoOp
       }
       val aggregateResult = new SpecificInternalRow(aggregateAttributes.map(_.dataType))
       val expressionAggEvalProjection = newMutableProjection(evalExpressions, bufferAttributes)
@@ -269,7 +270,7 @@ abstract class AggregationIterator(
       // calling serialization before shuffling. See [[TypedImperativeAggregate]] for more info.
       val typedImperativeAggregates: Array[TypedImperativeAggregate[_]] = {
         aggregateFunctions.collect {
-          case (ag: TypedImperativeAggregate[_]) => ag
+          case ag: TypedImperativeAggregate[_] => ag
         }
       }
 

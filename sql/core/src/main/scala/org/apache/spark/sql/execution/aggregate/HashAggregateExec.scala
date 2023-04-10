@@ -135,9 +135,9 @@ case class HashAggregateExec(
 
   private val groupingAttributes = groupingExpressions.map(_.toAttribute)
   private val groupingKeySchema = DataTypeUtils.fromAttributes(groupingAttributes)
-  private val declFunctions = aggregateExpressions.map(_.aggregateFunction)
-    .filter(_.isInstanceOf[DeclarativeAggregate])
-    .map(_.asInstanceOf[DeclarativeAggregate])
+  private val declFunctions = aggregateExpressions
+    .map(_.aggregateFunction)
+    .collect { case fn: DeclarativeAggregate => fn }
   private val bufferSchema = DataTypeUtils.fromAttributes(aggregateBufferAttributes)
 
   // The name for Fast HashMap
@@ -178,8 +178,7 @@ case class HashAggregateExec(
 
   def getEmptyAggregationBuffer(): InternalRow = {
     val initExpr = declFunctions.flatMap(f => f.initialValues)
-    val initialBuffer = UnsafeProjection.create(initExpr)(EmptyRow)
-    initialBuffer
+    UnsafeProjection.create(initExpr)(EmptyRow)
   }
 
   /**

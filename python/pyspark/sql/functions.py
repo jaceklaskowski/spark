@@ -14632,7 +14632,7 @@ def bucket(numBuckets: Union[Column, int], col: "ColumnOrName") -> Column:
 @try_remote_functions
 def call_udf(udfName: str, *cols: "ColumnOrName") -> Column:
     """
-    Call an user-defined function.
+    Call a user-defined function.
 
     .. versionadded:: 3.4.0
 

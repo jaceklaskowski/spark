@@ -330,7 +330,8 @@ class SparkSessionExtensions {
     functionRegistry
   }
 
-  private[sql] def registerTableFunctions(tableFunctionRegistry: TableFunctionRegistry) = {
+  private[sql] def registerTableFunctions(
+      tableFunctionRegistry: TableFunctionRegistry): TableFunctionRegistry = {
     for ((name, expressionInfo, function) <- injectedTableFunctions) {
       tableFunctionRegistry.registerFunction(name, expressionInfo, function)
     }

@@ -464,7 +464,7 @@ private[spark] class TaskSetManager(
         }
       }
 
-      var dequeuedTaskIndex: Option[Int] = None
+      var dequeuedTaskIndex: Option[Int] = Some(-1)
       val taskDescription =
         dequeueTask(execId, host, allowedLocality)
           .map { case (index, taskLocality, speculative) =>
@@ -499,7 +499,7 @@ private[spark] class TaskSetManager(
         taskDescription.isEmpty &&
           maxLocality == TaskLocality.ANY &&
           hasPendingTasks
-      (taskDescription, hasScheduleDelayReject, dequeuedTaskIndex.getOrElse(-1))
+      (taskDescription, hasScheduleDelayReject, dequeuedTaskIndex.get)
     } else {
       (None, false, -1)
     }
