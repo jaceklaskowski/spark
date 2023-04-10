@@ -2357,10 +2357,10 @@ object RewriteIntersectAll extends Rule[LogicalPlan] {
     case Intersect(left, right, true) =>
       assert(left.output.size == right.output.size)
 
-      val trueVcol1 = Alias(Literal(true), "vcol1")()
+      val trueVcol1 = Alias(Literal.TrueLiteral, "vcol1")()
       val nullVcol1 = Alias(Literal(null, BooleanType), "vcol1")()
 
-      val trueVcol2 = Alias(Literal(true), "vcol2")()
+      val trueVcol2 = Alias(Literal.TrueLiteral, "vcol2")()
       val nullVcol2 = Alias(Literal(null, BooleanType), "vcol2")()
 
       // Add a projection on the top of left and right plans to project out

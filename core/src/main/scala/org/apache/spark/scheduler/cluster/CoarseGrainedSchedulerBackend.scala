@@ -363,7 +363,7 @@ class CoarseGrainedSchedulerBackend(scheduler: TaskSchedulerImpl, val rpcEnv: Rp
         val workOffers = activeExecutors.map {
           case (id, executorData) => buildWorkerOffer(id, executorData)
         }.toIndexedSeq
-        scheduler.resourceOffers(workOffers, true)
+        scheduler.resourceOffers(workOffers)
       }
       if (taskDescs.nonEmpty) {
         launchTasks(taskDescs)
@@ -400,7 +400,7 @@ class CoarseGrainedSchedulerBackend(scheduler: TaskSchedulerImpl, val rpcEnv: Rp
         if (isExecutorActive(executorId)) {
           val executorData = executorDataMap(executorId)
           val workOffers = IndexedSeq(buildWorkerOffer(executorId, executorData))
-          scheduler.resourceOffers(workOffers, false)
+          scheduler.resourceOffers(workOffers, isAllFreeResources = false)
         } else {
           Seq.empty
         }

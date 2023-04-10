@@ -136,6 +136,6 @@ private[sql] object PredicateUtils {
   }
 
   def toV1(predicates: Array[Predicate]): Array[Filter] = {
-    predicates.flatMap(toV1(_))
+    predicates.flatMap(toV1)
   }
 }

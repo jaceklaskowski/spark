@@ -401,7 +401,7 @@ private[spark] class TaskSchedulerImpl(
       val host = shuffledOffers(i).host
       val taskSetRpID = taskSet.taskSet.resourceProfileId
 
-      // check whether the task can be scheduled to the executor base on resource profile.
+      // check whether the task can be scheduled to the executor based on resource profile
       if (sc.resourceProfileManager
         .canBeScheduled(taskSetRpID, shuffledOffers(i).resourceProfileId)) {
         val taskResAssignmentsOpt = resourcesMeetTaskRequirements(taskSet, availableCpus(i),

@@ -740,7 +740,7 @@ trait CheckAnalysis extends PredicateHelper with LookupCatalog with QueryErrorsB
 
           case i: Intersect if !i.duplicateResolved =>
             val conflictingAttributes =
-              i.left.outputSet.intersect(i.right.outputSet).map(toSQLExpr(_)).mkString(", ")
+              i.left.outputSet.intersect(i.right.outputSet).map(toSQLExpr).mkString(", ")
             throw SparkException.internalError(
               msg = s"""
                        |Failure when resolving conflicting references in ${i.nodeName}:

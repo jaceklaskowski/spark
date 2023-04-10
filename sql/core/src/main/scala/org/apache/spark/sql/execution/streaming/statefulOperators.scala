@@ -1021,7 +1021,7 @@ case class StreamingDeduplicateExec(
 
 object StreamingDeduplicateExec {
   private val EMPTY_ROW =
-    UnsafeProjection.create(Array[DataType](NullType)).apply(InternalRow.apply(null))
+    UnsafeProjection.create(Array[DataType](NullType)).apply(InternalRow.empty)
 }
 
 case class StreamingDeduplicateWithinWatermarkExec(

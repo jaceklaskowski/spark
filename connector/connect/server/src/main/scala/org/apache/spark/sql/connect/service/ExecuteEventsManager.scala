@@ -46,7 +46,7 @@ object ExecuteStatus {
 }
 
 /**
- * Post request Connect events to @link org.apache.spark.scheduler.LiveListenerBus.
+ * Post request Connect events to [[org.apache.spark.scheduler.LiveListenerBus]].
  *
  * @param executeHolder:
  *   Request for which the events are generated.

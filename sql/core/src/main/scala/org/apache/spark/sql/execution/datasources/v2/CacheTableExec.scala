@@ -90,7 +90,7 @@ case class CacheTableAsSelectExec(
     override val isLazy: Boolean,
     override val options: Map[String, String],
     referredTempFunctions: Seq[String]) extends BaseCacheTableExec {
-  override lazy val relationName: String = tempViewName
+  override val relationName: String = tempViewName
 
   override lazy val planToCache: LogicalPlan = {
     CreateViewCommand(

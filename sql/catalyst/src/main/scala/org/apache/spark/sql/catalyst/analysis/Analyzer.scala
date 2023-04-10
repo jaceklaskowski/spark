@@ -559,7 +559,7 @@ class Analyzer(override val catalogManager: CatalogManager) extends RuleExecutor
 
   object ResolveGroupingAnalytics extends Rule[LogicalPlan] {
     private[analysis] def hasGroupingFunction(e: Expression): Boolean = {
-      e.exists (g => g.isInstanceOf[Grouping] || g.isInstanceOf[GroupingID])
+      e.exists { g => g.isInstanceOf[Grouping] || g.isInstanceOf[GroupingID] }
     }
 
     private def replaceGroupingFunc(

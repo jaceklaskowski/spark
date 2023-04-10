@@ -86,7 +86,7 @@ object EliminateResolvedHint extends Rule[LogicalPlan] {
         val (plan, hints) = extractHintsFromPlan(u.child)
         (u.withNewChildren(Seq(plan)), hints)
       // TODO revisit this logic:
-      // except and intersect are semi/anti-joins which won't return more data then
+      // except and intersect are semi/anti-joins which won't return more data than
       // their left argument, so the broadcast hint should be propagated here
       case i: Intersect =>
         val (plan, hints) = extractHintsFromPlan(i.left)

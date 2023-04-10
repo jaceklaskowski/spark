@@ -46,12 +46,15 @@ case class AddFilesCommand(paths: Seq[String]) extends LeafRunnableCommand {
 }
 
 /**
- * Adds an archive to the current session so it can be used.
+ * Adds one or many archives to the current session
+ * (to be downloaded and unpacked with this Spark job on every node).
+ *
+ * @see [[org.apache.spark.SparkContext.addArchive]]
  */
 case class AddArchivesCommand(paths: Seq[String]) extends LeafRunnableCommand {
   override def run(sparkSession: SparkSession): Seq[Row] = {
-    paths.foreach(sparkSession.sparkContext.addArchive(_))
-    Seq.empty[Row]
+    paths.foreach(sparkSession.sparkContext.addArchive)
+    Seq.empty
   }
 }
 
@@ -65,7 +68,7 @@ case class ListFilesCommand(files: Seq[String] = Seq.empty[String]) extends Leaf
   }
   override def run(sparkSession: SparkSession): Seq[Row] = {
     val fileList = sparkSession.sparkContext.listFiles()
-    if (files.size > 0) {
+    if (files.nonEmpty) {
       files.map { f =>
         val uri = Utils.resolveURI(f)
         uri.getScheme match {

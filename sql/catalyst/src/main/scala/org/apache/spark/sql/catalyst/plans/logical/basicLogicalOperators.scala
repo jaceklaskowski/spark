@@ -412,7 +412,7 @@ case class Except(
 /** Factory for constructing new `Union` nodes. */
 object Union {
   def apply(left: LogicalPlan, right: LogicalPlan): Union = {
-    Union (left :: right :: Nil)
+    Union(left :: right :: Nil)
   }
 }
 
@@ -431,18 +431,14 @@ case class Union(
   assert(!allowMissingCol || byName, "`allowMissingCol` can be true only if `byName` is true.")
 
   override def maxRows: Option[Long] = {
-    var sum = BigInt(0)
-    children.foreach { child =>
-      if (child.maxRows.isDefined) {
-        sum += child.maxRows.get
-        if (!sum.isValidLong) {
-          return None
-        }
-      } else {
-        return None
-      }
+    val sum = children
+      .flatMap(_.maxRows)
+      .foldLeft(BigInt(0))(_ + _)
+    if (sum.isValidLong) {
+      Some(sum.toLong)
+    } else {
+      None
     }
-    Some(sum.toLong)
   }
 
   final override val nodePatterns: Seq[TreePattern] = Seq(UNION)
@@ -500,40 +496,40 @@ case class Union(
     children.length > 1 && !(byName || allowMissingCol) && childrenResolved && allChildrenCompatible
   }
 
-  /**
-   * Maps the constraints containing a given (original) sequence of attributes to those with a
-   * given (reference) sequence of attributes. Given the nature of union, we expect that the
-   * mapping between the original and reference sequences are symmetric.
-   */
-  private def rewriteConstraints(
+  override protected lazy val validConstraints: ExpressionSet = {
+    /**
+     * Maps the constraints containing a given (original) sequence of attributes to those with a
+     * given (reference) sequence of attributes. Given the nature of union, we expect that the
+     * mapping between the original and reference sequences are symmetric.
+     */
+    def rewriteConstraints(
       reference: Seq[Attribute],
       original: Seq[Attribute],
       constraints: ExpressionSet): ExpressionSet = {
-    require(reference.size == original.size)
-    val attributeRewrites = AttributeMap(original.zip(reference))
-    constraints.map(_ transform {
-      case a: Attribute => attributeRewrites(a)
-    })
-  }
-
-  private def merge(a: ExpressionSet, b: ExpressionSet): ExpressionSet = {
-    val common = a.intersect(b)
-    // The constraint with only one reference could be easily inferred as predicate
-    // Grouping the constraints by it's references so we can combine the constraints with same
-    // reference together
-    val othera = a.diff(common).filter(_.references.size == 1).groupBy(_.references.head)
-    val otherb = b.diff(common).filter(_.references.size == 1).groupBy(_.references.head)
-    // loose the constraints by: A1 && B1 || A2 && B2  ->  (A1 || A2) && (B1 || B2)
-    val others = (othera.keySet intersect otherb.keySet).map { attr =>
-      Or(othera(attr).reduceLeft(And), otherb(attr).reduceLeft(And))
+      require(reference.size == original.size)
+      val attributeRewrites = AttributeMap(original.zip(reference))
+      constraints.map(_ transform {
+        case a: Attribute => attributeRewrites(a)
+      })
     }
-    common ++ others
-  }
 
-  override protected lazy val validConstraints: ExpressionSet = {
+    def merge(a: ExpressionSet, b: ExpressionSet): ExpressionSet = {
+      val common = a.intersect(b)
+      // The constraint with only one reference could be easily inferred as predicate
+      // Grouping the constraints by it's references so we can combine the constraints with same
+      // reference together
+      val othera = a.diff(common).filter(_.references.size == 1).groupBy(_.references.head)
+      val otherb = b.diff(common).filter(_.references.size == 1).groupBy(_.references.head)
+      // loose the constraints by: A1 && B1 || A2 && B2  ->  (A1 || A2) && (B1 || B2)
+      val others = (othera.keySet intersect otherb.keySet).map { attr =>
+        Or(othera(attr).reduceLeft(And), otherb(attr).reduceLeft(And))
+      }
+      common ++ others
+    }
+
     children
       .map(child => rewriteConstraints(children.head.output, child.output, child.constraints))
-      .reduce(merge(_, _))
+      .reduce(merge)
   }
 
   override protected def withNewChildrenInternal(newChildren: IndexedSeq[LogicalPlan]): Union =

@@ -120,7 +120,7 @@ case class ParquetScan(
 
   override def hashCode(): Int = getClass.hashCode()
 
-  lazy private val (pushedAggregationsStr, pushedGroupByStr) = if (pushedAggregate.nonEmpty) {
+  private lazy val (pushedAggregationsStr, pushedGroupByStr) = if (pushedAggregate.nonEmpty) {
     (seqToString(pushedAggregate.get.aggregateExpressions),
       seqToString(pushedAggregate.get.groupByExpressions))
   } else {

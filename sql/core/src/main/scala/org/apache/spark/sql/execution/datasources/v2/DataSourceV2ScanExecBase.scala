@@ -105,10 +105,7 @@ trait DataSourceV2ScanExecBase extends LeafExecNode {
 
   @transient lazy val groupedPartitions: Option[Seq[(InternalRow, Seq[InputPartition])]] = {
     // Early check if we actually need to materialize the input partitions.
-    keyGroupedPartitioning match {
-      case Some(_) => groupPartitions(inputPartitions)
-      case _ => None
-    }
+    keyGroupedPartitioning.flatMap(_ => groupPartitions(inputPartitions))
   }
 
   /**
@@ -126,8 +123,8 @@ trait DataSourceV2ScanExecBase extends LeafExecNode {
   def groupPartitions(
       inputPartitions: Seq[InputPartition],
       groupSplits: Boolean = !conf.v2BucketingPushPartValuesEnabled ||
-          !conf.v2BucketingPartiallyClusteredDistributionEnabled):
-    Option[Seq[(InternalRow, Seq[InputPartition])]] = {
+          !conf.v2BucketingPartiallyClusteredDistributionEnabled
+    ): Option[Seq[(InternalRow, Seq[InputPartition])]] = {
 
     if (!SQLConf.get.v2BucketingEnabled) return None
     keyGroupedPartitioning.flatMap { expressions =>

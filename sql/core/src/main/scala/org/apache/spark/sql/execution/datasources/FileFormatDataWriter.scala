@@ -267,7 +267,7 @@ abstract class BaseDynamicPartitionDataWriter(
       releaseCurrentWriter()
     }
 
-    val partDir = partitionValues.map(getPartitionPath(_))
+    val partDir = partitionValues.map(getPartitionPath)
     partDir.foreach(updatedPartitions.add)
 
     val bucketIdStr = bucketId.map(BucketingUtils.bucketIdToString).getOrElse("")

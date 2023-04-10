@@ -32,9 +32,15 @@ private[spark] object Python {
     .createWithDefaultString("2s")
 
   val PYTHON_USE_DAEMON = ConfigBuilder("spark.python.use.daemon")
+    .doc("Because forking processes from Java is expensive, " +
+      "PySpark prefers launching a single Python daemon, `pyspark/daemon.py` (by default) " +
+      "and tell it to fork new workers for our tasks. " +
+      "This daemon currently only works on UNIX-based systems " +
+      "because it uses signals for child management, " +
+      "so we can also fall back to launching workers, `pyspark/worker.py` (by default) directly.")
     .version("2.3.0")
     .booleanConf
-    .createWithDefault(true)
+    .createWithDefault(!System.getProperty("os.name").startsWith("Windows"))
 
   val PYTHON_LOG_INFO = ConfigBuilder("spark.executor.python.worker.log.details")
     .version("3.5.0")
@@ -42,14 +48,20 @@ private[spark] object Python {
     .createWithDefault(false)
 
   val PYTHON_DAEMON_MODULE = ConfigBuilder("spark.python.daemon.module")
+    .doc("The Python module to run the daemon to execute Python workers." +
+      "Note that this configuration has effect only when " +
+      s"'${PYTHON_USE_DAEMON.key}' is enabled and the platform is not Windows.")
     .version("2.4.0")
     .stringConf
-    .createOptional
+    .createWithDefaultString("pyspark.daemon")
 
   val PYTHON_WORKER_MODULE = ConfigBuilder("spark.python.worker.module")
+    .doc("The Python module to run Python workers." +
+      "Note that this configuration has effect when " +
+      s"'${PYTHON_USE_DAEMON.key}' is disabled or the platform is Windows.")
     .version("2.4.0")
     .stringConf
-    .createOptional
+    .createWithDefaultString("pyspark.worker")
 
   val PYSPARK_EXECUTOR_MEMORY = ConfigBuilder("spark.executor.pyspark.memory")
     .version("2.4.0")

@@ -764,7 +764,6 @@ case class DescribeColumnCommand(
     override val output: Seq[Attribute])
   extends LeafRunnableCommand {
 
-
   override def run(sparkSession: SparkSession): Seq[Row] = {
     val catalog = sparkSession.sessionState.catalog
     val resolver = sparkSession.sessionState.conf.resolver

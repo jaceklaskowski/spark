@@ -1528,15 +1528,17 @@ class AstBuilder extends DataTypeAstBuilder with SQLConfHelper with Logging {
   }
 
   private def extractNamedArgument(expr: FunctionArgumentContext, funcName: String) : Expression = {
-    Option(expr.namedArgumentExpression).map { n =>
-      if (conf.getConf(SQLConf.ALLOW_NAMED_FUNCTION_ARGUMENTS)) {
-        NamedArgumentExpression(n.key.getText, expression(n.value))
-      } else {
-        throw QueryCompilationErrors.namedArgumentsNotEnabledError(funcName, n.key.getText)
+    Option(expr.namedArgumentExpression)
+      .map { n =>
+        if (conf.getConf(SQLConf.ALLOW_NAMED_FUNCTION_ARGUMENTS)) {
+          NamedArgumentExpression(n.key.getText, expression(n.value))
+        } else {
+          throw QueryCompilationErrors.namedArgumentsNotEnabledError(funcName, n.key.getText)
+        }
       }
-    }.getOrElse {
-      expression(expr)
-    }
+      .getOrElse {
+        expression(expr)
+      }
   }
 
   private def withTimeTravel(
@@ -1572,50 +1574,55 @@ class AstBuilder extends DataTypeAstBuilder with SQLConfHelper with Logging {
 
   private def extractFunctionTableNamedArgument(
       expr: FunctionTableReferenceArgumentContext, funcName: String) : Expression = {
-    Option(expr.functionTableNamedArgumentExpression).map { n =>
-      if (conf.getConf(SQLConf.ALLOW_NAMED_FUNCTION_ARGUMENTS)) {
-        NamedArgumentExpression(
-          n.key.getText, visitFunctionTableSubqueryArgument(n.functionTableSubqueryArgument))
-      } else {
-        throw QueryCompilationErrors.namedArgumentsNotEnabledError(funcName, n.key.getText)
+    Option(expr.functionTableNamedArgumentExpression)
+      .map { namedArg =>
+        if (conf.getConf(SQLConf.ALLOW_NAMED_FUNCTION_ARGUMENTS)) {
+          NamedArgumentExpression(
+            namedArg.key.getText,
+            visitFunctionTableSubqueryArgument(namedArg.functionTableSubqueryArgument))
+        } else {
+          throw QueryCompilationErrors.namedArgumentsNotEnabledError(funcName, namedArg.key.getText)
+        }
       }
-    }.getOrElse {
-      visitFunctionTableSubqueryArgument(expr.functionTableSubqueryArgument)
-    }
+      .getOrElse {
+        visitFunctionTableSubqueryArgument(expr.functionTableSubqueryArgument)
+      }
   }
 
   /**
    * Create a table-valued function call with arguments, e.g. range(1000)
    */
-  override def visitTableValuedFunction(ctx: TableValuedFunctionContext)
-      : LogicalPlan = withOrigin(ctx) {
-    val func = ctx.functionTable
-    val aliases = if (func.tableAlias.identifierList != null) {
-      visitIdentifierList(func.tableAlias.identifierList)
-    } else {
-      Seq.empty
+  override def visitTableValuedFunction(
+      ctx: TableValuedFunctionContext): LogicalPlan = {
+    withOrigin(ctx) {
+      val func = ctx.functionTable
+      val aliases = if (func.tableAlias.identifierList != null) {
+        visitIdentifierList(func.tableAlias.identifierList)
+      } else {
+        Seq.empty
+      }
+
+      withFuncIdentClause(
+        func.functionName,
+        ident => {
+          if (ident.length > 1) {
+            throw QueryParsingErrors.invalidTableValuedFunctionNameError(ident, ctx)
+          }
+          val funcName = func.functionName.getText
+          val args = func.functionTableArgument.asScala.map { e =>
+            Option(e.functionArgument).map(extractNamedArgument(_, funcName))
+              .getOrElse {
+                extractFunctionTableNamedArgument(e.functionTableReferenceArgument, funcName)
+              }
+          }.toSeq
+
+          val tvf = UnresolvedTableValuedFunction(ident, args)
+
+          val tvfAliases = if (aliases.nonEmpty) UnresolvedTVFAliases(ident, tvf, aliases) else tvf
+
+          tvfAliases.optionalMap(func.tableAlias.strictIdentifier)(aliasPlan)
+        })
     }
-
-    withFuncIdentClause(
-      func.functionName,
-      ident => {
-        if (ident.length > 1) {
-          throw QueryParsingErrors.invalidTableValuedFunctionNameError(ident, ctx)
-        }
-        val funcName = func.functionName.getText
-        val args = func.functionTableArgument.asScala.map { e =>
-          Option(e.functionArgument).map(extractNamedArgument(_, funcName))
-            .getOrElse {
-              extractFunctionTableNamedArgument(e.functionTableReferenceArgument, funcName)
-            }
-        }.toSeq
-
-        val tvf = UnresolvedTableValuedFunction(ident, args)
-
-        val tvfAliases = if (aliases.nonEmpty) UnresolvedTVFAliases(ident, tvf, aliases) else tvf
-
-        tvfAliases.optionalMap(func.tableAlias.strictIdentifier)(aliasPlan)
-      })
   }
 
   /**
@@ -3101,7 +3108,7 @@ class AstBuilder extends DataTypeAstBuilder with SQLConfHelper with Logging {
     }
     // Add the 'DEFAULT expression' clause in the column definition, if any, to the column metadata.
     defaultExpression.map(visitDefaultExpression).foreach { field =>
-      if (conf.getConf(SQLConf.ENABLE_DEFAULT_COLUMNS)) {
+      if (conf.enableDefaultColumns) {
         // Add default to metadata
         builder.putString(ResolveDefaultColumns.CURRENT_DEFAULT_COLUMN_METADATA_KEY, field)
         builder.putString(ResolveDefaultColumns.EXISTS_DEFAULT_COLUMN_METADATA_KEY, field)
@@ -3487,7 +3494,7 @@ class AstBuilder extends DataTypeAstBuilder with SQLConfHelper with Logging {
     }
 
     CreateNamespace(
-      withIdentClause(ctx.identifierReference, UnresolvedNamespace(_)),
+      withIdentClause(ctx.identifierReference, UnresolvedNamespace),
       ctx.EXISTS != null,
       properties)
   }
@@ -4196,7 +4203,7 @@ class AstBuilder extends DataTypeAstBuilder with SQLConfHelper with Logging {
       } else {
         None
       }
-    if (setDefaultExpression.isDefined && !conf.getConf(SQLConf.ENABLE_DEFAULT_COLUMNS)) {
+    if (setDefaultExpression.isDefined && !conf.enableDefaultColumns) {
       throw QueryParsingErrors.defaultColumnNotEnabledError(ctx)
     }
 

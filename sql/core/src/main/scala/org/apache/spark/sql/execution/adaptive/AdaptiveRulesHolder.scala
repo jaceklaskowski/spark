@@ -22,7 +22,7 @@ import org.apache.spark.sql.catalyst.rules.Rule
 import org.apache.spark.sql.execution.SparkPlan
 
 /**
- * A holder to warp the SQL extension rules of adaptive query execution.
+ * A holder with the SQL extension rules of Adaptive Query Execution.
  *
  * @param queryStagePrepRules applied before creation of query stages
  * @param runtimeOptimizerRules applied to tune logical plan based on the runtime statistics of

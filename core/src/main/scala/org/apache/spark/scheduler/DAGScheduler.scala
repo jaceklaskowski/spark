@@ -1522,7 +1522,7 @@ private[spark] class DAGScheduler(
     }
     val taskIdToLocations: Map[Int, Seq[TaskLocation]] = try {
       stage match {
-        case s: ShuffleMapStage =>
+        case _: ShuffleMapStage =>
           partitionsToCompute.map { id => (id, getPreferredLocs(stage.rdd, id))}.toMap
         case s: ResultStage =>
           partitionsToCompute.map { id =>
@@ -1567,12 +1567,13 @@ private[spark] class DAGScheduler(
       // this synchronization in case another concurrent job is checkpointing this RDD, so we get a
       // consistent view of both variables.
       RDDCheckpointData.synchronized {
-        taskBinaryBytes = stage match {
-          case stage: ShuffleMapStage =>
-            JavaUtils.bufferToArray(
-              closureSerializer.serialize((stage.rdd, stage.shuffleDep): AnyRef))
-          case stage: ResultStage =>
-            JavaUtils.bufferToArray(closureSerializer.serialize((stage.rdd, stage.func): AnyRef))
+        taskBinaryBytes = JavaUtils.bufferToArray {
+          stage match {
+            case stage: ShuffleMapStage =>
+                closureSerializer.serialize((stage.rdd, stage.shuffleDep): AnyRef)
+            case stage: ResultStage =>
+                closureSerializer.serialize((stage.rdd, stage.func): AnyRef)
+          }
         }
 
         partitions = stage.rdd.partitions

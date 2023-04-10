@@ -639,7 +639,7 @@ object SizeBasedWindowFunction {
 // scalastyle:off line.size.limit line.contains.tab
 @ExpressionDescription(
   usage = """
-    _FUNC_() - Assigns a unique, sequential number to each row, starting with one,
+    _FUNC_() - Assigns a unique, sequential number to each row, starting from one,
       according to the ordering of rows within the window partition.
   """,
   examples = """

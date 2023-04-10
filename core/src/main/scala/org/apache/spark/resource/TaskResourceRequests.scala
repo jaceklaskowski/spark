@@ -83,6 +83,6 @@ class TaskResourceRequests() extends Serializable {
   }
 
   override def toString: String = {
-    s"Task resource requests: ${_taskResources}"
+    s"Task resource requests: $requests"
   }
 }

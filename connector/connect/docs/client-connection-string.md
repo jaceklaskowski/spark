@@ -50,16 +50,16 @@ sc://hostname:port/;param1=value;param2=value
   <tr>
     <td>port</td>
 <td>Numeric</td>
-    <td>The portname to be used when connecting to the GRPC endpoint. The
-    default values is: <b>15002</b>. Any valid port number can be used.</td>
+    <td>The port to be used when connecting to the GRPC endpoint. The
+    default value is: <b>15002</b>. Any valid port number can be used.</td>
     <td><pre>15002</pre><pre>443</pre></td>
   </tr>
   <tr>
     <td>token</td>
     <td>String</td>
     <td>When this param is set in the URL, it will enable standard
-    bearer token authentication using GRPC. By default this value is not set.
-    Setting this value enables SSL.</td>
+    bearer token authentication using GRPC. By default, this value is not set.
+    Setting this value enables SSL (`use_ssl=true`).</td>
     <td><pre>token=ABCDEFGH</pre></td>
   </tr>
   <tr>
@@ -75,7 +75,7 @@ sc://hostname:port/;param1=value;param2=value
     <td>user_id</td>
     <td>String</td>
     <td>User ID to automatically set in the Spark Connect UserContext message.
-    This is necssary for the appropriate Spark Session management. This is an
+    This is necessary for the appropriate Spark Session management. This is an
     *optional* parameter and depending on the deployment this parameter might
     be automatically injected using other means.</td>
     <td>
@@ -129,7 +129,7 @@ server_url = "sc://myhost.com:443/;use_ssl=true;token=ABCDEFG"
 
 As mentioned above, Spark Connect uses a regular GRPC client and the server path
 cannot be configured to remain compatible with the GRPC standard and HTTP. For
-example the following examles are invalid.
+example, the following example is invalid.
 
 ```python
 server_url = "sc://myhost.com:443/mypathprefix/;token=AAAAAAA"

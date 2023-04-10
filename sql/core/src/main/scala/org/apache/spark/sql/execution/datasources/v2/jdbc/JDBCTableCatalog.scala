@@ -34,8 +34,11 @@ import org.apache.spark.sql.jdbc.{JdbcDialect, JdbcDialects}
 import org.apache.spark.sql.types.StructType
 import org.apache.spark.sql.util.CaseInsensitiveStringMap
 
-class JDBCTableCatalog extends TableCatalog
-  with SupportsNamespaces with FunctionCatalog with Logging {
+class JDBCTableCatalog
+    extends TableCatalog
+    with SupportsNamespaces
+    with FunctionCatalog
+    with Logging {
   import org.apache.spark.sql.connector.catalog.CatalogV2Implicits._
 
   private var catalogName: String = null
@@ -44,12 +47,12 @@ class JDBCTableCatalog extends TableCatalog
   private var functions: Map[String, UnboundFunction] = _
 
   override def name(): String = {
-    require(catalogName != null, "The JDBC table catalog is not initialed")
+    require(catalogName != null, "The JDBC table catalog is not initialized")
     catalogName
   }
 
   override def initialize(name: String, options: CaseInsensitiveStringMap): Unit = {
-    assert(catalogName == null, "The JDBC table catalog is already initialed")
+    assert(catalogName == null, "The JDBC table catalog is already initialized")
     catalogName = name
 
     val map = options.asCaseSensitiveMap().asScala.toMap

@@ -192,7 +192,7 @@ abstract class JdbcDialect extends Serializable with Logging {
   }
 
   /**
-   * Get the SQL query that should be used to find if the given table exists. Dialects can
+   * Get the SQL query that should be used to find out if the given table exists. Dialects can
    * override this method to return a query that works best in a particular database.
    * @param table  The name of the table.
    * @return The SQL query to use for checking the table.

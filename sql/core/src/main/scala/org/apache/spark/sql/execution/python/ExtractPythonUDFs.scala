@@ -153,8 +153,8 @@ object ExtractGroupingPythonUDFFromAggregate extends Rule[LogicalPlan] {
  * Only extracts the PythonUDFs that could be evaluated in Python (the single child is PythonUDFs
  * or all the children could be evaluated in JVM).
  *
- * This has the limitation that the input to the Python UDF is not allowed include attributes from
- * multiple child operators.
+ * This has the limitation that the input to the Python UDF is not allowed to include attributes
+ * from multiple child operators.
  */
 object ExtractPythonUDFs extends Rule[LogicalPlan] {
 

@@ -1115,9 +1115,11 @@ case class EqualNullSafe(left: Expression, right: Expression) extends BinaryComp
     val eval1 = left.genCode(ctx)
     val eval2 = right.genCode(ctx)
     val equalCode = ctx.genEqual(left.dataType, eval1.value, eval2.value)
-    ev.copy(code = eval1.code + eval2.code + code"""
+    ev.copy(
+      code = eval1.code + eval2.code + code"""
         boolean ${ev.value} = (${eval1.isNull} && ${eval2.isNull}) ||
-           (!${eval1.isNull} && !${eval2.isNull} && $equalCode);""", isNull = FalseLiteral)
+           (!${eval1.isNull} && !${eval2.isNull} && $equalCode);""",
+      isNull = FalseLiteral)
   }
 
   override protected def withNewChildrenInternal(

@@ -225,7 +225,7 @@ class InternalFrame:
     information.
 
     .. note:: this is an internal class. It is not supposed to be exposed to users and users
-        should not directly access to it.
+        should not directly access it.
 
     The internal immutable DataFrame represents the index information for a DataFrame it belongs to.
     For instance, if we have a pandas-on-Spark DataFrame as below, pandas DataFrame does not
@@ -1098,7 +1098,7 @@ class InternalFrame:
     @lazy_property
     def to_internal_spark_frame(self) -> PySparkDataFrame:
         """
-        Return as Spark DataFrame. This contains index columns as well
+        Returns a Spark DataFrame. This contains index columns as well
         and should be only used for internal purposes.
         """
         index_spark_columns = self.index_spark_columns

@@ -141,7 +141,8 @@ object UnsafeProjection
    * CAUTION: the returned projection object is *not* thread-safe.
    */
   def create(fields: Array[DataType]): UnsafeProjection = {
-    create(fields.zipWithIndex.map(x => BoundReference(x._2, x._1, true)))
+    create(fields.zipWithIndex.map { case (dataType, ordinal) =>
+      BoundReference(ordinal, dataType, nullable = true) })
   }
 
   /**

@@ -887,7 +887,7 @@ object SQLConf {
   val SUBEXPRESSION_ELIMINATION_SKIP_FOR_SHORTCUT_EXPR =
     buildConf("spark.sql.subexpressionElimination.skipForShortcutExpr")
       .internal()
-      .doc("When true, shortcut eliminate subexpression with `AND`, `OR`. " +
+      .doc("When true, shortcut eliminate subexpression with `AND` and `OR`. " +
         "The subexpression may not need to eval even if it appears more than once. " +
         "e.g., `if(or(a, and(b, b)))`, the expression `b` would be skipped if `a` is true.")
       .version("3.5.0")
@@ -1781,7 +1781,7 @@ object SQLConf {
 
   val FILES_MAX_PARTITION_NUM = buildConf("spark.sql.files.maxPartitionNum")
     .doc("The suggested (not guaranteed) maximum number of split file partitions. If it is set, " +
-      "Spark will rescale each partition to make the number of partitions is close to this " +
+      "Spark will rescale each partition to make the number of partitions close to this " +
       "value if the initial number of partitions exceeds this value. This configuration is " +
       "effective only when using file-based sources such as Parquet, JSON and ORC.")
     .version("3.5.0")
@@ -2820,7 +2820,7 @@ object SQLConf {
         "1. pyspark.sql.DataFrame.toPandas. " +
         "2. pyspark.sql.SparkSession.createDataFrame when its input is a Pandas DataFrame " +
         "or a NumPy ndarray. " +
-        "The following data type is unsupported: " +
+        "The following data types are unsupported: " +
         "ArrayType of TimestampType.")
       .version("3.0.0")
       .fallbackConf(ARROW_EXECUTION_ENABLED)

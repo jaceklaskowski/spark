@@ -79,8 +79,10 @@ object ResolveDefaultColumns extends QueryErrorsBase with ResolveDefaultColumnsU
       val newFields: Seq[StructField] = tableSchema.fields.map { field =>
         if (field.metadata.contains(CURRENT_DEFAULT_COLUMN_METADATA_KEY)) {
           val analyzed: Expression = analyze(field, statementType)
-          val newMetadata: Metadata = new MetadataBuilder().withMetadata(field.metadata)
-            .putString(EXISTS_DEFAULT_COLUMN_METADATA_KEY, analyzed.sql).build()
+          val newMetadata: Metadata = new MetadataBuilder()
+            .withMetadata(field.metadata)
+            .putString(EXISTS_DEFAULT_COLUMN_METADATA_KEY, analyzed.sql)
+            .build()
           field.copy(metadata = newMetadata)
         } else {
           field

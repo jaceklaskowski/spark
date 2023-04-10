@@ -159,7 +159,7 @@ class Frame(object, metaclass=ABCMeta):
         Returns a DataFrame or Series of the same size containing the cumulative minimum.
 
         .. note:: the current implementation of cummin uses Spark's Window without
-            specifying partition specification. This leads to moveing all data into a
+            specifying partition specification. This moves all data into a
             single partition in a single machine and could cause serious
             performance degradation. Avoid this method with very large datasets.
 
@@ -219,7 +219,7 @@ class Frame(object, metaclass=ABCMeta):
         Returns a DataFrame or Series of the same size containing the cumulative maximum.
 
         .. note:: the current implementation of cummax uses Spark's Window without
-            specifying partition specification. This leads to moveing all data into a
+            specifying partition specification. This moves all data into a
             single partition in a single machine and could cause serious
             performance degradation. Avoid this method with very large datasets.
 

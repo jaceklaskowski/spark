@@ -46,7 +46,7 @@ def pandas_udf(f=None, returnType=None, functionType=None):
     Creates a pandas user defined function (a.k.a. vectorized user defined function).
 
     Pandas UDFs are user defined functions that are executed by Spark using Arrow to transfer
-    data and Pandas to work with the data, which allows vectorized operations. A Pandas UDF
+    data and Pandas to work with the data, which allows for vectorized operations. A Pandas UDF
     is defined using the `pandas_udf` as a decorator or to wrap the function, and no
     additional configuration is required. A Pandas UDF behaves as a regular PySpark function
     API in general.

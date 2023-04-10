@@ -130,7 +130,7 @@ case class ExpandExec(
      *   // increment metrics and consume output values
      * }
      *
-     * We use a for loop here so we only includes one copy of the consume code and avoid code
+     * We use a for loop here so we only include one copy of the consume code and avoid code
      * size explosion.
      */
 

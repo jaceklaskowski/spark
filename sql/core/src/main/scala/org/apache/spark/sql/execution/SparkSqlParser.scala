@@ -494,19 +494,22 @@ class SparkSqlAstBuilder extends AstBuilder {
     checkDuplicateClauses(ctx.PARTITIONED, "PARTITIONED ON", ctx)
     checkDuplicateClauses(ctx.TBLPROPERTIES, "TBLPROPERTIES", ctx)
 
-    val userSpecifiedColumns = Option(ctx.identifierCommentList).toSeq.flatMap { icl =>
-      icl.identifierComment.asScala.map { ic =>
-        ic.identifier.getText -> Option(ic.commentSpec()).map(visitCommentSpec)
+    val userSpecifiedColumns = Option(ctx.identifierCommentList)
+      .toSeq
+      .flatMap { icl =>
+        icl.identifierComment.asScala.map { ic =>
+          ic.identifier.getText -> Option(ic.commentSpec()).map(visitCommentSpec)
+        }
       }
-    }
 
     if (ctx.EXISTS != null && ctx.REPLACE != null) {
       throw QueryParsingErrors.createViewWithBothIfNotExistsAndReplaceError(ctx)
     }
 
-    val properties = ctx.propertyList.asScala.headOption.map(visitPropertyKeyValues)
+    val properties = ctx.propertyList.asScala.headOption
+      .map(visitPropertyKeyValues)
       .getOrElse(Map.empty)
-    if (ctx.TEMPORARY != null && !properties.isEmpty) {
+    if (ctx.TEMPORARY != null && properties.nonEmpty) {
       operationNotAllowed("TBLPROPERTIES can't coexist with CREATE TEMPORARY VIEW", ctx)
     }
 

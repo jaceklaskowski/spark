@@ -70,7 +70,9 @@ abstract class ParameterizedQuery(child: LogicalPlan) extends UnresolvedUnaryNod
  * @param child The parameterized logical plan.
  * @param args The map of parameter names to its literal values.
  */
-case class NameParameterizedQuery(child: LogicalPlan, args: Map[String, Expression])
+case class NameParameterizedQuery(
+    child: LogicalPlan,
+    args: Map[String, Expression])
   extends ParameterizedQuery(child) {
   assert(args.nonEmpty)
   override protected def withNewChildInternal(newChild: LogicalPlan): LogicalPlan =
@@ -96,11 +98,13 @@ case class PosParameterizedQuery(child: LogicalPlan, args: Array[Expression])
  */
 object BindParameters extends Rule[LogicalPlan] with QueryErrorsBase {
   private def checkArgs(args: Iterable[(String, Expression)]): Unit = {
-    args.find(!_._2.isInstanceOf[Literal]).foreach { case (name, expr) =>
-      expr.failAnalysis(
-        errorClass = "INVALID_SQL_ARG",
-        messageParameters = Map("name" -> name))
-    }
+    args
+      .find { case (_, expr) => !expr.isInstanceOf[Literal] }
+      .foreach { case (name, expr) =>
+        expr.failAnalysis(
+          errorClass = "INVALID_SQL_ARG",
+          messageParameters = Map("name" -> name))
+      }
   }
 
   private def bind(p: LogicalPlan)(f: PartialFunction[Expression, Expression]): LogicalPlan = {
@@ -111,19 +115,19 @@ object BindParameters extends Rule[LogicalPlan] with QueryErrorsBase {
 
   override def apply(plan: LogicalPlan): LogicalPlan = {
     if (plan.containsPattern(PARAMETERIZED_QUERY)) {
-      // One unresolved plan can have at most one ParameterizedQuery.
+      val message = "One unresolved plan can have at most one ParameterizedQuery"
       val parameterizedQueries = plan.collect { case p: ParameterizedQuery => p }
-      assert(parameterizedQueries.length == 1)
+      assert(parameterizedQueries.length == 1, message)
     }
 
     plan.resolveOperatorsWithPruning(_.containsPattern(PARAMETERIZED_QUERY)) {
       // We should wait for `CTESubstitution` to resolve CTE before binding parameters, as CTE
       // relations are not children of `UnresolvedWith`.
-      case p @ NameParameterizedQuery(child, args) if !child.containsPattern(UNRESOLVED_WITH) =>
+      case NameParameterizedQuery(child, args) if !child.containsPattern(UNRESOLVED_WITH) =>
         checkArgs(args)
         bind(child) { case NamedParameter(name) if args.contains(name) => args(name) }
 
-      case p @ PosParameterizedQuery(child, args) if !child.containsPattern(UNRESOLVED_WITH) =>
+      case PosParameterizedQuery(child, args) if !child.containsPattern(UNRESOLVED_WITH) =>
         val indexedArgs = args.zipWithIndex
         checkArgs(indexedArgs.map(arg => (s"_${arg._2}", arg._1)))
 

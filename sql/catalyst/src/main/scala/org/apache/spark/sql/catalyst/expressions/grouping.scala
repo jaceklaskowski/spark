@@ -25,7 +25,7 @@ import org.apache.spark.sql.internal.SQLConf
 import org.apache.spark.sql.types._
 
 /**
- * A placeholder expression for cube/rollup, which will be replaced by analyzer
+ * A placeholder expression for cube/rollup/grouping sets, which will be replaced by analyzer
  */
 trait BaseGroupingSets extends Expression with CodegenFallback {
 

@@ -239,8 +239,10 @@ trait AnalysisHelper extends QueryPlan[LogicalPlan] { self: LogicalPlan =>
    *               subtree. Do not pass it if the rule is not purely functional and reads a
    *               varying initial state for different invocations.
    */
-  def resolveExpressionsWithPruning(cond: TreePatternBits => Boolean,
-    ruleId: RuleId = UnknownRuleId)(rule: PartialFunction[Expression, Expression]): LogicalPlan = {
+  def resolveExpressionsWithPruning(
+      cond: TreePatternBits => Boolean,
+      ruleId: RuleId = UnknownRuleId)(
+      rule: PartialFunction[Expression, Expression]): LogicalPlan = {
     resolveOperatorsWithPruning(cond, ruleId) {
       case p => p.transformExpressionsWithPruning(cond, ruleId)(rule)
     }

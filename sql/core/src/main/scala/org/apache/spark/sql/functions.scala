@@ -63,16 +63,20 @@ import org.apache.spark.util.Utils
  *
  * @groupname udf_funcs UDF functions
  * @groupname agg_funcs Aggregate functions
+ * @groupname bitwise_funcs Bitwise functions
  * @groupname datetime_funcs Date time functions
  * @groupname sort_funcs Sorting functions
  * @groupname normal_funcs Non-aggregate functions
+ * @groupname map_funcs Map (collection) functions
  * @groupname math_funcs Math functions
  * @groupname misc_funcs Misc functions
+ * @groupname predicates_funcs Predicates functions
  * @groupname window_funcs Window functions
  * @groupname string_funcs String functions
  * @groupname collection_funcs Collection functions
  * @groupname partition_transforms Partition transform functions
  * @groupname Ungrouped Support functions for DataFrames
+ * @groupname xml_funcs XML functions
  * @since 1.3.0
  */
 @Stable
@@ -83,8 +87,8 @@ object functions {
   private def withExpr(expr: Expression): Column = Column(expr)
 
   private def withAggregateFunction(
-    func: AggregateFunction,
-    isDistinct: Boolean = false): Column = {
+      func: AggregateFunction,
+      isDistinct: Boolean = false): Column = {
     Column(func.toAggregateExpression(isDistinct))
   }
 
@@ -7894,7 +7898,7 @@ object functions {
 
   /**
    * Obtains a `UserDefinedFunction` that wraps the given `Aggregator`
-   * so that it may be used with untyped Data Frames.
+   * so that it may be used with untyped DataFrames.
    * {{{
    *   Aggregator<IN, BUF, OUT> agg = // custom Aggregator
    *   Encoder<IN> enc = // input encoder

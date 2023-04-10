@@ -60,10 +60,13 @@ case class SortAggregateExec(
       // Because the constructor of an aggregation iterator will read at least the first row,
       // we need to get the value of iter.hasNext first.
       val hasInput = iter.hasNext
+
+      // FIXME beforeAgg as in HashAggregateExec
+
       if (!hasInput && groupingExpressions.nonEmpty) {
         // This is a grouped aggregate and the input iterator is empty,
         // so return an empty iterator.
-        Iterator[UnsafeRow]()
+        Iterator.empty
       } else {
         val outputIter = new SortBasedAggregationIterator(
           partIndex,

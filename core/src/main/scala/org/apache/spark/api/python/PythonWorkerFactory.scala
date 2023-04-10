@@ -38,40 +38,13 @@ private[spark] class PythonWorkerFactory(pythonExec: String, envVars: Map[String
 
   import PythonWorkerFactory._
 
-  // Because forking processes from Java is expensive, we prefer to launch a single Python daemon,
-  // pyspark/daemon.py (by default) and tell it to fork new workers for our tasks. This daemon
-  // currently only works on UNIX-based systems now because it uses signals for child management,
-  // so we can also fall back to launching workers, pyspark/worker.py (by default) directly.
-  private val useDaemon = {
-    val useDaemonEnabled = SparkEnv.get.conf.get(PYTHON_USE_DAEMON)
-
-    // This flag is ignored on Windows as it's unable to fork.
-    !System.getProperty("os.name").startsWith("Windows") && useDaemonEnabled
-  }
+  private val useDaemon = SparkEnv.get.conf.get(PYTHON_USE_DAEMON)
 
   // WARN: Both configurations, 'spark.python.daemon.module' and 'spark.python.worker.module' are
   // for very advanced users and they are experimental. This should be considered
   // as expert-only option, and shouldn't be used before knowing what it means exactly.
-
-  // This configuration indicates the module to run the daemon to execute its Python workers.
-  private val daemonModule =
-    SparkEnv.get.conf.get(PYTHON_DAEMON_MODULE).map { value =>
-      logInfo(
-        s"Python daemon module in PySpark is set to [$value] in '${PYTHON_DAEMON_MODULE.key}', " +
-        "using this to start the daemon up. Note that this configuration only has an effect when " +
-        s"'${PYTHON_USE_DAEMON.key}' is enabled and the platform is not Windows.")
-      value
-    }.getOrElse("pyspark.daemon")
-
-  // This configuration indicates the module to run each Python worker.
-  private val workerModule =
-    SparkEnv.get.conf.get(PYTHON_WORKER_MODULE).map { value =>
-      logInfo(
-        s"Python worker module in PySpark is set to [$value] in '${PYTHON_WORKER_MODULE.key}', " +
-        "using this to start the worker up. Note that this configuration only has an effect when " +
-        s"'${PYTHON_USE_DAEMON.key}' is disabled or the platform is Windows.")
-      value
-    }.getOrElse("pyspark.worker")
+  private val daemonModule = SparkEnv.get.conf.get(PYTHON_DAEMON_MODULE)
+  private val workerModule = SparkEnv.get.conf.get(PYTHON_WORKER_MODULE)
 
   private val authHelper = new SocketAuthHelper(SparkEnv.get.conf)
 

@@ -606,7 +606,7 @@ class UDFRegistration:
             if returnType is None:
                 returnType = StringType()
             return_udf = _create_udf(
-                f, returnType=returnType, evalType=PythonEvalType.SQL_BATCHED_UDF, name=name
+                f, returnType=returnType, name=name, evalType=PythonEvalType.SQL_BATCHED_UDF
             )
             register_udf = return_udf._unwrapped
         self.sparkSession._jsparkSession.udf().registerPython(name, register_udf._judf)

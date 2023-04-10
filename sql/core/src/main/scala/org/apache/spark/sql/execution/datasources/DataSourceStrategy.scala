@@ -136,7 +136,7 @@ object DataSourceAnalysis extends Rule[LogicalPlan] {
   override def apply(plan: LogicalPlan): LogicalPlan = plan resolveOperators {
     case CreateTable(tableDesc, mode, None) if DDLUtils.isDatasourceTable(tableDesc) =>
       ResolveDefaultColumns.validateTableProviderForDefaultValue(
-        tableDesc.schema, tableDesc.provider, "CREATE TABLE", false)
+        tableDesc.schema, tableDesc.provider, "CREATE TABLE", addNewColumnToExistingTable = false)
       val newSchema: StructType =
         ResolveDefaultColumns.constantFoldCurrentDefaultsToExistDefaults(
           tableDesc.schema, "CREATE TABLE")

@@ -39,10 +39,13 @@ import org.apache.spark.sql.types.StructType
  * {{{
  *   CREATE TABLE [IF NOT EXISTS] [db_name.]table_name
  *   [(col1 data_type [COMMENT col_comment], ...)]
- *   USING format OPTIONS ([option1_name "option1_value", option2_name "option2_value", ...])
+ *   USING format
+ *   OPTIONS ([option1_name "option1_value", option2_name "option2_value", ...])
  * }}}
  */
-case class CreateDataSourceTableCommand(table: CatalogTable, ignoreIfExists: Boolean)
+case class CreateDataSourceTableCommand(
+    table: CatalogTable,
+    ignoreIfExists: Boolean)
   extends LeafRunnableCommand {
 
   override def run(sparkSession: SparkSession): Seq[Row] = {
@@ -75,7 +78,7 @@ case class CreateDataSourceTableCommand(table: CatalogTable, ignoreIfExists: Boo
         className = table.provider.get,
         bucketSpec = table.bucketSpec,
         options = table.storage.properties ++ pathOption,
-        // As discussed in SPARK-19583, we don't check if the location is existed
+        // As discussed in SPARK-19583, we don't check if the location exists
         catalogTable = Some(tableWithDefaultOptions)).resolveRelation(checkFilesExist = false)
 
     val partitionColumnNames = if (table.schema.nonEmpty) {
@@ -116,7 +119,7 @@ case class CreateDataSourceTableCommand(table: CatalogTable, ignoreIfExists: Boo
     }
 
     // We will return Nil or throw exception at the beginning if the table already exists, so when
-    // we reach here, the table should not exist and we should set `ignoreIfExists` to false.
+    // we reach here, the table does not exist and hence `ignoreIfExists` is false.
     sessionState.catalog.createTable(newTable, ignoreIfExists = false)
 
     Seq.empty[Row]
