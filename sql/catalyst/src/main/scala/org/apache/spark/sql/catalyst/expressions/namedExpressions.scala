@@ -577,13 +577,16 @@ object FileSourceMetadataAttribute {
     dataType
   }
 
-  private def removeInternalMetadata(metadata: Metadata) = new MetadataBuilder()
-    .withMetadata(metadata)
-    .remove(METADATA_COL_ATTR_KEY)
-    .remove(FILE_SOURCE_METADATA_COL_ATTR_KEY)
-    .remove(FileSourceConstantMetadataStructField.FILE_SOURCE_CONSTANT_METADATA_COL_ATTR_KEY)
-    .remove(FileSourceGeneratedMetadataStructField.FILE_SOURCE_GENERATED_METADATA_COL_ATTR_KEY)
-    .build()
+  private def removeInternalMetadata(
+      metadata: Metadata): Metadata = {
+    new MetadataBuilder()
+      .withMetadata(metadata)
+      .remove(METADATA_COL_ATTR_KEY)
+      .remove(FILE_SOURCE_METADATA_COL_ATTR_KEY)
+      .remove(FileSourceConstantMetadataStructField.FILE_SOURCE_CONSTANT_METADATA_COL_ATTR_KEY)
+      .remove(FileSourceGeneratedMetadataStructField.FILE_SOURCE_GENERATED_METADATA_COL_ATTR_KEY)
+      .build()
+  }
 }
 
 /**

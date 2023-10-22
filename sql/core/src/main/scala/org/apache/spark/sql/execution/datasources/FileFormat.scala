@@ -173,7 +173,7 @@ trait FileFormat {
     // avoids confusion by mapping back to [[metadataSchemaFields]].
     val fields = metadataSchemaFields
       .map(FileSourceMetadataAttribute.cleanupFileSourceMetadataInformation)
-    FileSourceMetadataAttribute(FileFormat.METADATA_NAME, StructType(fields), nullable = false)
+    FileSourceMetadataAttribute(FileFormat.METADATA_NAME, StructType(fields))
   }
 
   /**

@@ -51,12 +51,6 @@ trait TreePatternBits {
    * @return true if at least one bit for `patterns` is set; false otherwise.
    */
   final def containsAnyPattern(patterns: TreePattern*): Boolean = {
-    val iterator = patterns.iterator
-    while (iterator.hasNext) {
-      if (containsPattern(iterator.next)) {
-        return true
-      }
-    }
-    false
+    patterns.exists(containsPattern)
   }
 }

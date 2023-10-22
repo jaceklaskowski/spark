@@ -87,7 +87,7 @@ object InjectRuntimeFilter extends Rule[LogicalPlan] with PredicateHelper with J
     val alias = Alias(bloomFilterAgg.toAggregateExpression(), "bloomFilter")()
     val aggregate =
       ConstantFolding(ColumnPruning(Aggregate(Nil, Seq(alias), filterCreationSidePlan)))
-    val bloomFilterSubquery = ScalarSubquery(aggregate, Nil)
+    val bloomFilterSubquery = ScalarSubquery(aggregate)
     val filter = BloomFilterMightContain(bloomFilterSubquery,
       new XxHash64(Seq(filterApplicationSideExp)))
     Filter(filter, filterApplicationSidePlan)
@@ -315,7 +315,7 @@ object InjectRuntimeFilter extends Rule[LogicalPlan] with PredicateHelper with J
       case join @ ExtractEquiJoinKeys(joinType, leftKeys, rightKeys, _, _, left, right, hint) =>
         var newLeft = left
         var newRight = right
-        (leftKeys, rightKeys).zipped.foreach((l, r) => {
+        (leftKeys, rightKeys).zipped.foreach { (l, r) =>
           // Check if:
           // 1. There is already a DPP filter on the key
           // 2. There is already a runtime filter (Bloom filter or IN subquery) on the key
@@ -343,7 +343,7 @@ object InjectRuntimeFilter extends Rule[LogicalPlan] with PredicateHelper with J
               filterCounter = filterCounter + 1
             }
           }
-        })
+        }
         join.withNewChildren(Seq(newLeft, newRight))
     }
   }

@@ -368,7 +368,7 @@ class ParquetFileFormat
 object ParquetFileFormat extends Logging {
   val ROW_INDEX = "row_index"
 
-  // A name for a temporary column that holds row indexes computed by the file format reader
+  // A name for a temporary column that holds row indices computed by the file format reader
   // until they can be placed in the _metadata struct.
   val ROW_INDEX_TEMPORARY_COLUMN_NAME = s"_tmp_metadata_$ROW_INDEX"
 

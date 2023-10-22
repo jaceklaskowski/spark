@@ -350,7 +350,7 @@ object LiteralTreeBits {
 /**
  * In order to do type checking, use Literal.create() instead of constructor
  */
-case class Literal (value: Any, dataType: DataType) extends LeafExpression {
+case class Literal(value: Any, dataType: DataType) extends LeafExpression {
 
   Literal.validateLiteralValue(value, dataType)
 

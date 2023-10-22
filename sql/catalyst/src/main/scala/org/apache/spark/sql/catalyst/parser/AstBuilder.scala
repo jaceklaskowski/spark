@@ -1539,7 +1539,6 @@ class AstBuilder extends DataTypeAstBuilder with SQLConfHelper with Logging {
 
   private def withTimeTravel(
       ctx: TemporalClauseContext, plan: LogicalPlan): LogicalPlan = withOrigin(ctx) {
-    val v = ctx.version
     val version = visitVersion(ctx.version)
     val timestamp = Option(ctx.timestamp).map(expression)
     if (timestamp.exists(_.references.nonEmpty)) {
